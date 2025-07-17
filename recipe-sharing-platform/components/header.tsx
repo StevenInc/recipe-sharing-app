@@ -1,8 +1,10 @@
 import Link from 'next/link';
+import SupabaseStatusBadge from '@/components/supabase-status-badge';
 
 export default function Header() {
   return (
-    <header className="w-full bg-white border-b border-gray-100 shadow-sm">
+    <header className="w-full bg-white border-b border-gray-100 shadow-sm relative">
+      <SupabaseStatusBadge />
       <nav className="max-w-7xl mx-auto flex items-center justify-between h-16 px-4">
         {/* Logo/Brand */}
         <div className="flex items-center gap-2">
