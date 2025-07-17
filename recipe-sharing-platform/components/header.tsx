@@ -25,8 +25,8 @@ export default function Header() {
         </div>
         {/* Actions */}
         <div className="flex items-center gap-4">
-          <Link href="#" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">Login</Link>
-          <Link href="#" className="bg-black text-white font-semibold px-4 py-2 rounded-md hover:bg-gray-800 transition-colors">Sign Up</Link>
+          <Link href="/login" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">Login</Link>
+          <Link href="/login" className="bg-black text-white font-semibold px-4 py-2 rounded-md hover:bg-gray-800 transition-colors">Sign Up</Link>
         </div>
       </nav>
     </header>
