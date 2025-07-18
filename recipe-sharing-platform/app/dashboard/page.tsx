@@ -58,7 +58,15 @@ export default function DashboardPage() {
         </button>
       </div>
       <div className="w-full max-w-2xl">
-        <h2 className="text-xl font-semibold mb-4">My Recipes</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">My Recipes</h2>
+          <button
+            className="bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2 rounded transition"
+            onClick={() => router.push('/dashboard/add-recipe')}
+          >
+            Add Recipe
+          </button>
+        </div>
         <div className="bg-white rounded shadow p-6 text-gray-400 text-center">
           (Recipe list coming soon)
         </div>
