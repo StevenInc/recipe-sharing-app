@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Profile, Recipe } from '@/lib/types/database'
+import LikeButton from '@/components/like-button';
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -133,6 +134,7 @@ export default function DashboardPage() {
                   <div className="text-sm text-gray-500 mb-1">{recipe.category}</div>
                   <div className="text-xs text-gray-400 mb-2">{new Date(recipe.created_at).toLocaleDateString()}</div>
                   <div className="text-gray-600 text-sm line-clamp-2 mb-2">{recipe.description}</div>
+                  <LikeButton recipeId={recipe.id} stopPropagation />
                   {/* Add view/edit/delete actions here if needed */}
                 </div>
               ))}

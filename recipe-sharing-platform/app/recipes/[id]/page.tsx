@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import type { Recipe } from '@/lib/types/database';
 import RecipeEditLink from '@/components/recipe-edit-link';
+import LikeButton from '@/components/like-button';
 
 interface RecipeDetailPageProps {
   params: { id: string } | Promise<{ id: string }>;
@@ -52,6 +53,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           )}
         </div>
         <div className="text-lg text-gray-700 mb-4">{recipe.description}</div>
+        <LikeButton recipeId={recipe.id} />
         <div className="mb-4">
           <h2 className="font-semibold mb-1">Ingredients</h2>
           <ul className="list-disc list-inside text-gray-800">
