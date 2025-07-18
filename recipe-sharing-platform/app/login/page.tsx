@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
+  const searchParams = useSearchParams();
+  const initialMode = searchParams?.get('mode') === 'signup' ? 'signup' : 'signin';
+  const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
@@ -14,6 +16,12 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
   const router = useRouter()
+
+  useEffect(() => {
+    const urlMode = searchParams?.get('mode');
+    if (urlMode === 'signup' && mode !== 'signup') setMode('signup');
+    if (urlMode !== 'signup' && mode !== 'signin') setMode('signin');
+  }, [searchParams, mode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -112,12 +120,24 @@ export default function LoginPage() {
           {mode === 'signin' ? (
             <span>
               No account?{' '}
-              <button type="button" className="underline" onClick={() => setMode('signup')}>Sign Up</button>
+              <button
+                type="button"
+                className="underline"
+                onClick={() => router.push('/login?mode=signup')}
+              >
+                Sign Up
+              </button>
             </span>
           ) : (
             <span>
               Already have an account?{' '}
-              <button type="button" className="underline" onClick={() => setMode('signin')}>Sign In</button>
+              <button
+                type="button"
+                className="underline"
+                onClick={() => router.push('/login')}
+              >
+                Sign In
+              </button>
             </span>
           )}
         </div>
