@@ -4,20 +4,34 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import SupabaseStatusBadge from '@/components/supabase-status-badge';
 import { createClient } from '@/lib/supabase/client';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
+    const supabase = createClient();
     const checkAuth = async () => {
-      const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       setIsAuthenticated(!!user);
     };
     checkAuth();
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session?.user);
+    });
+    return () => {
+      listener.subscription.unsubscribe();
+    };
   }, []);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setIsAuthenticated(false);
+    router.push('/');
+  };
 
   return (
     <header className="w-full bg-white border-b border-gray-100 shadow-sm relative">
@@ -52,6 +66,13 @@ export default function Header() {
               {pathname !== '/dashboard/profile' && (
                 <Link href="/dashboard/profile" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">Profile</Link>
               )}
+              <button
+                onClick={handleLogout}
+                className="text-gray-500 hover:text-red-600 font-medium transition-colors"
+                type="button"
+              >
+                Log Out
+              </button>
             </>
           ) : (
             <>
