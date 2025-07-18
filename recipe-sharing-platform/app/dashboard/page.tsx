@@ -92,13 +92,13 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
           <input
             type="text"
-            className="w-full sm:basis-3/4 p-2 border rounded"
+            className="w-full sm:basis-3/4 p-2 border rounded h-10"
             placeholder="Search recipes by title..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
           <select
-            className="w-full sm:basis-1/4 p-2 border rounded"
+            className="w-full sm:basis-1/4 p-2 border rounded h-10"
             value={category}
             onChange={e => setCategory(e.target.value)}
           >
