@@ -1,7 +1,24 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import SupabaseStatusBadge from '@/components/supabase-status-badge';
+import { createClient } from '@/lib/supabase/client';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+    };
+    checkAuth();
+  }, []);
+
   return (
     <header className="w-full bg-white border-b border-gray-100 shadow-sm relative">
       <SupabaseStatusBadge />
@@ -27,8 +44,21 @@ export default function Header() {
         </div>
         {/* Actions */}
         <div className="flex items-center gap-4">
-          <Link href="/login" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">Login</Link>
-          <Link href="/login?mode=signup" className="bg-black text-white font-semibold px-4 py-2 rounded-md hover:bg-gray-800 transition-colors">Sign Up</Link>
+          {isAuthenticated === null ? null : isAuthenticated ? (
+            <>
+              {pathname !== '/dashboard' && (
+                <Link href="/dashboard" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">Dashboard</Link>
+              )}
+              {pathname !== '/dashboard/profile' && (
+                <Link href="/dashboard/profile" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">Profile</Link>
+              )}
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">Login</Link>
+              <Link href="/login?mode=signup" className="bg-black text-white font-semibold px-4 py-2 rounded-md hover:bg-gray-800 transition-colors">Sign Up</Link>
+            </>
+          )}
         </div>
       </nav>
     </header>
