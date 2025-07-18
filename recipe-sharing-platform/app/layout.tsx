@@ -1,6 +1,8 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import Header from '@/components/header'
+import SupabaseStatusBadge from '@/components/supabase-status-badge'
+import VersionBadge from '@/components/version-badge'
 
 export const metadata: Metadata = {
   title: 'RecipeShare',
@@ -15,8 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
+        <SupabaseStatusBadge refreshOnDashboard />
         <Header />
         {children}
+        {process.env.NODE_ENV === 'development' && <VersionBadge />}
       </body>
     </html>
   )
