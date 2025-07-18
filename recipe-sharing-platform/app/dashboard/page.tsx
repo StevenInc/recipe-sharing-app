@@ -3,35 +3,46 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import type { Profile } from '@/lib/types/database'
+import type { Profile, Recipe } from '@/lib/types/database'
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchProfileAndRecipes = async () => {
       const { data: { user }, error: userError } = await supabase.auth.getUser()
       if (userError || !user) {
         router.replace('/login')
         return
       }
-      const { data, error } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single()
-      if (error) {
-        setError(error.message)
+      if (profileError) {
+        setError(profileError.message)
       } else {
-        setProfile(data)
+        setProfile(profileData)
+      }
+      // Fetch all recipes (not just user's)
+      const { data: recipeData, error: recipeError } = await supabase
+        .from('recipes')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (recipeError) {
+        setError(recipeError.message)
+      } else {
+        setRecipes(recipeData || [])
       }
       setLoading(false)
     }
-    fetchProfile()
+    fetchProfileAndRecipes()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -67,9 +78,28 @@ export default function DashboardPage() {
             Add Recipe
           </button>
         </div>
-        <div className="bg-white rounded shadow p-6 text-gray-400 text-center">
-          (Recipe list coming soon)
-        </div>
+        {recipes.length === 0 ? (
+          <div className="bg-white rounded shadow p-6 text-gray-400 text-center">
+            (No recipes yet)
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {recipes.map(recipe => (
+              <div key={recipe.id} className="bg-white rounded-xl shadow p-4 flex flex-col">
+                {recipe.image_url ? (
+                  <img src={recipe.image_url} alt={recipe.title} className="w-full h-40 object-cover rounded mb-3" />
+                ) : (
+                  <div className="w-full h-40 bg-gray-100 rounded mb-3 flex items-center justify-center text-gray-400 text-4xl">🍲</div>
+                )}
+                <h3 className="font-bold text-lg mb-1 truncate">{recipe.title}</h3>
+                <div className="text-sm text-gray-500 mb-1">{recipe.category}</div>
+                <div className="text-xs text-gray-400 mb-2">{new Date(recipe.created_at).toLocaleDateString()}</div>
+                <div className="text-gray-600 text-sm line-clamp-2 mb-2">{recipe.description}</div>
+                {/* Add view/edit/delete actions here if needed */}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
