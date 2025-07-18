@@ -25,6 +25,13 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
 
   if (error || !recipe) return notFound();
 
+  // Fetch uploader's profile
+  const { data: uploader } = await supabase
+    .from('profiles')
+    .select('full_name, username')
+    .eq('id', recipe.user_id)
+    .single();
+
   // Fetch current user
   const { data: { user } } = await supabase.auth.getUser();
   const isOwner = user && user.id === recipe.user_id;
@@ -36,7 +43,14 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           <img src={recipe.image_url} alt={recipe.title} className="w-full h-64 object-cover rounded mb-6" />
         )}
         <h1 className="text-3xl font-bold mb-2">{recipe.title}</h1>
-        <div className="text-sm text-gray-500 mb-2">{recipe.category} &middot; {new Date(recipe.created_at).toLocaleDateString()}</div>
+        <div className="text-sm text-gray-500 mb-2">
+          {recipe.category} &middot; {new Date(recipe.created_at).toLocaleDateString()}
+          {uploader && (
+            <>
+              {' '} &middot; Uploaded by <span className="font-semibold">{uploader.full_name || uploader.username}</span>
+            </>
+          )}
+        </div>
         <div className="text-lg text-gray-700 mb-4">{recipe.description}</div>
         <div className="mb-4">
           <h2 className="font-semibold mb-1">Ingredients</h2>
