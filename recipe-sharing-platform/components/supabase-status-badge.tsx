@@ -1,27 +1,47 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { usePathname } from 'next/navigation'
 
-export default function SupabaseStatusBadge() {
+interface SupabaseStatusBadgeProps {
+  refreshOnDashboard?: boolean;
+}
+
+export default function SupabaseStatusBadge({ refreshOnDashboard }: SupabaseStatusBadgeProps) {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [count, setCount] = useState<number | null>(null)
+  const pathname = usePathname();
+
+  const fetchCount = async () => {
+    try {
+      const supabase = createClient()
+      const { count, error } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+      if (error) throw error
+      setCount(count ?? 0)
+      setStatus('success')
+    } catch {
+      setStatus('error')
+    }
+  }
 
   useEffect(() => {
-    const fetchCount = async () => {
-      try {
-        const supabase = createClient()
-        const { count, error } = await supabase
-          .from('profiles')
-          .select('id', { count: 'exact', head: true })
-        if (error) throw error
-        setCount(count ?? 0)
-        setStatus('success')
-      } catch {
-        setStatus('error')
-      }
-    }
     fetchCount()
   }, [])
+
+  useEffect(() => {
+    if (!refreshOnDashboard) return;
+    if (pathname === '/dashboard') {
+      fetchCount();
+    }
+  }, [pathname, refreshOnDashboard])
+
+  useEffect(() => {
+    const handler = () => fetchCount();
+    window.addEventListener('supabase-badge-refresh', handler);
+    return () => window.removeEventListener('supabase-badge-refresh', handler);
+  }, []);
 
   let color = 'bg-yellow-400 text-yellow-900 border-yellow-500'
   let text = 'Loading…'

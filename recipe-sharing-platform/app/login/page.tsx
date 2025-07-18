@@ -64,6 +64,11 @@ export default function LoginPage() {
         }
       }
       router.replace('/dashboard')
+      if (typeof window !== 'undefined') {
+        setTimeout(() => {
+          window.dispatchEvent(new Event('supabase-badge-refresh'));
+        }, 500);
+      }
     }
     setLoading(false)
   }
