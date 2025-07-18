@@ -85,7 +85,11 @@ export default function DashboardPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {recipes.map(recipe => (
-              <div key={recipe.id} className="bg-white rounded-xl shadow p-4 flex flex-col">
+              <div
+                key={recipe.id}
+                className="bg-white rounded-xl shadow p-4 flex flex-col cursor-pointer hover:shadow-lg transition"
+                onClick={() => router.push(`/recipes/${recipe.id}`)}
+              >
                 {recipe.image_url ? (
                   <img src={recipe.image_url} alt={recipe.title} className="w-full h-40 object-cover rounded mb-3" />
                 ) : (
