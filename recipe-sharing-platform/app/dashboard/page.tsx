@@ -10,6 +10,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [search, setSearch] = useState('');
   const router = useRouter()
   const supabase = createClient()
 
@@ -78,30 +79,39 @@ export default function DashboardPage() {
             Add Recipe
           </button>
         </div>
+        <input
+          type="text"
+          className="w-full mb-4 p-2 border rounded"
+          placeholder="Search recipes by title..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
         {recipes.length === 0 ? (
           <div className="bg-white rounded shadow p-6 text-gray-400 text-center">
             (No recipes yet)
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {recipes.map(recipe => (
-              <div
-                key={recipe.id}
-                className="bg-white rounded-xl shadow p-4 flex flex-col cursor-pointer hover:shadow-lg transition"
-                onClick={() => router.push(`/recipes/${recipe.id}`)}
-              >
-                {recipe.image_url ? (
-                  <img src={recipe.image_url} alt={recipe.title} className="w-full h-40 object-cover rounded mb-3" />
-                ) : (
-                  <div className="w-full h-40 bg-gray-100 rounded mb-3 flex items-center justify-center text-gray-400 text-4xl">🍲</div>
-                )}
-                <h3 className="font-bold text-lg mb-1 truncate">{recipe.title}</h3>
-                <div className="text-sm text-gray-500 mb-1">{recipe.category}</div>
-                <div className="text-xs text-gray-400 mb-2">{new Date(recipe.created_at).toLocaleDateString()}</div>
-                <div className="text-gray-600 text-sm line-clamp-2 mb-2">{recipe.description}</div>
-                {/* Add view/edit/delete actions here if needed */}
-              </div>
-            ))}
+            {recipes
+              .filter(recipe => recipe.title.toLowerCase().includes(search.toLowerCase()))
+              .map(recipe => (
+                <div
+                  key={recipe.id}
+                  className="bg-white rounded-xl shadow p-4 flex flex-col cursor-pointer hover:shadow-lg transition"
+                  onClick={() => router.push(`/recipes/${recipe.id}`)}
+                >
+                  {recipe.image_url ? (
+                    <img src={recipe.image_url} alt={recipe.title} className="w-full h-40 object-cover rounded mb-3" />
+                  ) : (
+                    <div className="w-full h-40 bg-gray-100 rounded mb-3 flex items-center justify-center text-gray-400 text-4xl">🍲</div>
+                  )}
+                  <h3 className="font-bold text-lg mb-1 truncate">{recipe.title}</h3>
+                  <div className="text-sm text-gray-500 mb-1">{recipe.category}</div>
+                  <div className="text-xs text-gray-400 mb-2">{new Date(recipe.created_at).toLocaleDateString()}</div>
+                  <div className="text-gray-600 text-sm line-clamp-2 mb-2">{recipe.description}</div>
+                  {/* Add view/edit/delete actions here if needed */}
+                </div>
+              ))}
           </div>
         )}
       </div>
