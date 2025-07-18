@@ -11,6 +11,16 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('All');
+  const CATEGORIES = [
+    'All',
+    'Breakfast',
+    'Lunch',
+    'Dinner',
+    'Dessert',
+    'Snack',
+    'Drink',
+  ];
   const router = useRouter()
   const supabase = createClient()
 
@@ -79,13 +89,24 @@ export default function DashboardPage() {
             Add Recipe
           </button>
         </div>
-        <input
-          type="text"
-          className="w-full mb-4 p-2 border rounded"
-          placeholder="Search recipes by title..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+          <input
+            type="text"
+            className="w-full sm:basis-3/4 p-2 border rounded"
+            placeholder="Search recipes by title..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          <select
+            className="w-full sm:basis-1/4 p-2 border rounded"
+            value={category}
+            onChange={e => setCategory(e.target.value)}
+          >
+            {CATEGORIES.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
         {recipes.length === 0 ? (
           <div className="bg-white rounded shadow p-6 text-gray-400 text-center">
             (No recipes yet)
@@ -93,7 +114,10 @@ export default function DashboardPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {recipes
-              .filter(recipe => recipe.title.toLowerCase().includes(search.toLowerCase()))
+              .filter(recipe =>
+                recipe.title.toLowerCase().includes(search.toLowerCase()) &&
+                (category === 'All' || recipe.category === category)
+              )
               .map(recipe => (
                 <div
                   key={recipe.id}
