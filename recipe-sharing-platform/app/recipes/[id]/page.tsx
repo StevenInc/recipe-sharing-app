@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import type { Recipe } from '@/lib/types/database';
 import RecipeEditLink from '@/components/recipe-edit-link';
 import LikeButton from '@/components/like-button';
+import CommentsSection from '@/components/comments-section';
 
 interface RecipeDetailPageProps {
   params: { id: string } | Promise<{ id: string }>;
@@ -71,6 +72,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           </ol>
         </div>
         <RecipeEditLink recipeUserId={recipe.user_id} recipeId={recipe.id} />
+        <CommentsSection recipeId={recipe.id} />
       </div>
     </div>
   );
