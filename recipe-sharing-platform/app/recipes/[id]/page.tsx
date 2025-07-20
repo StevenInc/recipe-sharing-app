@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import type { Recipe } from '@/lib/types/database';
 import RecipeEditLink from '@/components/recipe-edit-link';
 import LikeButton from '@/components/like-button';
@@ -42,7 +43,13 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 py-12 px-4">
       <div className="bg-white rounded-xl shadow p-8 w-full max-w-2xl">
         {recipe.image_url && (
-          <img src={recipe.image_url} alt={recipe.title} className="w-full h-64 object-cover rounded mb-6" />
+          <Image
+            src={recipe.image_url}
+            alt={recipe.title}
+            width={600}
+            height={400}
+            className="w-full h-64 object-cover rounded mb-6"
+          />
         )}
         <h1 className="text-3xl font-bold mb-2">{recipe.title}</h1>
         <div className="text-sm text-gray-500 mb-2">

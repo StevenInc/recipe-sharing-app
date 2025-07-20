@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import type { Recipe } from '@/lib/types/database';
 
@@ -208,8 +209,14 @@ export default function EditRecipePage() {
             accept="image/*"
             onChange={e => setImageFile(e.target.files?.[0] || null)}
           />
-          {form.image_url && !imageFile && (
-            <img src={form.image_url} alt="Current" className="w-full h-32 object-cover rounded mt-2" />
+          {form.image_url && (
+            <Image
+              src={form.image_url}
+              alt="Current"
+              width={300}
+              height={150}
+              className="w-full h-32 object-cover rounded mt-2"
+            />
           )}
         </div>
         {error && <div className="text-red-500 text-sm">{error}</div>}

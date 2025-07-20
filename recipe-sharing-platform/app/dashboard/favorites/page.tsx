@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import type { Recipe } from '@/lib/types/database';
 
@@ -218,9 +219,11 @@ export default function FavoritesPage() {
                 {filteredRecipes.map((recipe) => (
                   <div key={recipe.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                     {recipe.image_url && (
-                      <img
+                      <Image
                         src={recipe.image_url}
                         alt={recipe.title}
+                        width={300}
+                        height={200}
                         className="w-full h-48 object-cover"
                       />
                     )}

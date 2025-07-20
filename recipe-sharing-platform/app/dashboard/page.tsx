@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import type { Profile, Recipe } from '@/lib/types/database'
 import LikeButton from '@/components/like-button';
@@ -126,7 +127,13 @@ export default function DashboardPage() {
                   onClick={() => router.push(`/recipes/${recipe.id}`)}
                 >
                   {recipe.image_url ? (
-                    <img src={recipe.image_url} alt={recipe.title} className="w-full h-40 object-cover rounded mb-3" />
+                    <Image
+                      src={recipe.image_url}
+                      alt={recipe.title}
+                      width={320}
+                      height={200}
+                      className="w-full h-40 object-cover rounded mb-3"
+                    />
                   ) : (
                     <div className="w-full h-40 bg-gray-100 rounded mb-3 flex items-center justify-center text-gray-400 text-4xl">🍲</div>
                   )}
