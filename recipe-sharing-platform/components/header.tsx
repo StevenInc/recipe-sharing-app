@@ -8,18 +8,37 @@ import { usePathname, useRouter } from 'next/navigation';
 
 export default function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [authKey, setAuthKey] = useState(0); // Force re-render key
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
     const supabase = createClient();
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setIsAuthenticated(!!user);
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        console.log('Header auth check - user:', user?.id, 'error:', error);
+        if (error) {
+          console.error('Auth check error:', error);
+          setIsAuthenticated(false);
+          setAuthKey(prev => prev + 1); // Force re-render
+        } else {
+          setIsAuthenticated(!!user);
+          setAuthKey(prev => prev + 1); // Force re-render
+        }
+      } catch (err) {
+        console.error('Auth check exception:', err);
+        setIsAuthenticated(false);
+        setAuthKey(prev => prev + 1); // Force re-render
+      }
     };
     checkAuth();
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session?.user);
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Header auth state change - event:', event, 'user:', session?.user?.id);
+      const newAuthState = !!session?.user;
+      console.log('Setting auth state to:', newAuthState);
+      setIsAuthenticated(newAuthState);
+      setAuthKey(prev => prev + 1); // Force re-render
     });
     return () => {
       listener.subscription.unsubscribe();
@@ -33,8 +52,10 @@ export default function Header() {
     router.push('/');
   };
 
+  console.log('Header render - isAuthenticated:', isAuthenticated, 'authKey:', authKey);
+
   return (
-    <header className="w-full bg-white border-b border-gray-100 shadow-sm relative">
+    <header key={authKey} className="w-full bg-white border-b border-gray-100 shadow-sm relative">
       <SupabaseStatusBadge />
       <nav className="max-w-7xl mx-auto flex items-center justify-between h-16 px-4">
         {/* Logo/Brand */}
@@ -58,7 +79,10 @@ export default function Header() {
         </div>
         {/* Actions */}
         <div className="flex items-center gap-4">
-          {isAuthenticated === null ? null : isAuthenticated ? (
+          {isAuthenticated === null ? (
+            // Loading state - show nothing while checking auth
+            <div className="text-gray-400">Loading...</div>
+          ) : isAuthenticated ? (
             <>
               {pathname !== '/dashboard' && (
                 <Link href="/dashboard" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">Dashboard</Link>
