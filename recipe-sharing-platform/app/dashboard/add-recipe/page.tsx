@@ -60,7 +60,7 @@ export default function AddRecipePage() {
     if (imageFile) {
       const fileExt = imageFile.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
-      const { data, error: uploadError } = await supabase.storage.from('recipe-images').upload(fileName, imageFile);
+      const { error: uploadError } = await supabase.storage.from('recipe-images').upload(fileName, imageFile);
       if (uploadError) {
         setError('Image upload failed.');
         setLoading(false);
