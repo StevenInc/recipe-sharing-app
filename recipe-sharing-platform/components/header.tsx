@@ -87,6 +87,9 @@ export default function Header() {
               {pathname !== '/dashboard' && (
                 <Link href="/dashboard" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">Dashboard</Link>
               )}
+              {pathname !== '/dashboard/favorites' && (
+                <Link href="/dashboard/favorites" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">Favorites</Link>
+              )}
               {pathname !== '/dashboard/profile' && (
                 <Link href="/dashboard/profile" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">Profile</Link>
               )}
