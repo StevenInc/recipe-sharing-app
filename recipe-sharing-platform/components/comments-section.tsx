@@ -56,7 +56,17 @@ export default function CommentsSection({ recipeId }: CommentsSectionProps) {
       if (error) {
         console.error('Error fetching comments:', error);
       } else {
-        setComments(data || []);
+        const comments: Comment[] = (data || []).map(comment => ({
+          id: comment.id as string,
+          content: comment.content as string,
+          created_at: comment.created_at as string,
+          user_id: comment.user_id as string,
+          profiles: {
+            full_name: 'Unknown User', // We'll handle this separately if needed
+            username: 'unknown'
+          }
+        }));
+        setComments(comments);
       }
       setLoading(false);
     };
@@ -97,7 +107,17 @@ export default function CommentsSection({ recipeId }: CommentsSectionProps) {
         .eq('recipe_id', recipeId)
         .order('created_at', { ascending: false });
 
-      setComments(data || []);
+      const comments: Comment[] = (data || []).map(comment => ({
+        id: comment.id as string,
+        content: comment.content as string,
+        created_at: comment.created_at as string,
+        user_id: comment.user_id as string,
+        profiles: {
+          full_name: 'Unknown User', // We'll handle this separately if needed
+          username: 'unknown'
+        }
+      }));
+      setComments(comments);
     }
     setSubmitting(false);
   };

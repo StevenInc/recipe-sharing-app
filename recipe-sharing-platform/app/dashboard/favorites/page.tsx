@@ -43,40 +43,73 @@ export default function FavoritesPage() {
         return;
       }
 
-      // Fetch recipes that the user has favorited
-      const { data, error } = await supabase
+      // Fetch favorite recipe IDs first
+      const { data: favoritesData, error: favoritesError } = await supabase
         .from('favorites')
-        .select(`
-          recipe_id,
-          recipes (
-            id,
-            title,
-            description,
-            ingredients,
-            instructions,
-            category,
-            cooking_time,
-            difficulty,
-            image_url,
-            created_at,
-            user_id,
-            profiles (
-              full_name,
-              username
-            )
-          )
-        `)
+        .select('recipe_id')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching favorite recipes:', error);
+      if (favoritesError) {
+        console.error('Error fetching favorites:', favoritesError);
+        setError('Failed to load favorite recipes');
+        setLoading(false);
+        return;
+      }
+
+      if (!favoritesData || favoritesData.length === 0) {
+        setFavoriteRecipes([]);
+        setFilteredRecipes([]);
+        setLoading(false);
+        return;
+      }
+
+      // Extract recipe IDs
+      const recipeIds = favoritesData.map(fav => fav.recipe_id);
+
+      // Fetch the actual recipes
+      const { data: recipesData, error: recipesError } = await supabase
+        .from('recipes')
+        .select(`
+          id,
+          title,
+          description,
+          ingredients,
+          instructions,
+          category,
+          cooking_time,
+          difficulty,
+          image_url,
+          created_at,
+          user_id
+        `)
+        .in('id', recipeIds)
+        .order('created_at', { ascending: false });
+
+      if (recipesError) {
+        console.error('Error fetching recipes:', recipesError);
         setError('Failed to load favorite recipes');
       } else {
-        // Extract the recipes from the nested structure
-        const recipes = data?.map(fav => fav.recipes).filter(Boolean) as FavoriteRecipe[];
-        setFavoriteRecipes(recipes || []);
-        setFilteredRecipes(recipes || []);
+        // Transform the data to match FavoriteRecipe interface
+        const recipes: FavoriteRecipe[] = (recipesData || []).map(recipe => ({
+          id: recipe.id as string,
+          title: recipe.title as string,
+          description: recipe.description as string | null,
+          ingredients: recipe.ingredients as string[],
+          instructions: recipe.instructions as string[],
+          category: recipe.category as string,
+          cooking_time: recipe.cooking_time as number | null,
+          difficulty: recipe.difficulty as 'easy' | 'medium' | 'hard' | null,
+          image_url: recipe.image_url as string | null,
+          created_at: recipe.created_at as string,
+          user_id: recipe.user_id as string,
+          profiles: {
+            full_name: 'Unknown User', // We'll handle this separately if needed
+            username: 'unknown'
+          }
+        }));
+        setFavoriteRecipes(recipes);
+        setFilteredRecipes(recipes);
       }
       setLoading(false);
     };

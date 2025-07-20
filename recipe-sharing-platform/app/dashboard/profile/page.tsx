@@ -29,12 +29,21 @@ export default function ProfilePage() {
       if (error) {
         setError(error.message);
       } else {
-        setProfile(data);
+        const profile: Profile = {
+          id: data.id as string,
+          created_at: data.created_at as string,
+          username: data.username as string,
+          full_name: data.full_name as string,
+          updated_at: data.updated_at as string,
+          email: data.email as string,
+          bio: data.bio as string | null,
+        };
+        setProfile(profile);
         setForm({
-          email: data.email || "",
-          username: data.username || "",
-          full_name: data.full_name || "",
-          bio: data.bio || "",
+          email: profile.email || "",
+          username: profile.username || "",
+          full_name: profile.full_name || "",
+          bio: profile.bio || "",
         });
       }
       setLoading(false);
@@ -67,7 +76,7 @@ export default function ProfilePage() {
         bio: form.bio,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", profile?.id);
+      .eq("id", profile!.id);
     if (error) {
       setError(error.message);
     } else {

@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import type { Recipe } from '@/lib/types/database';
+import { useParams } from 'next/navigation';
 
 const CATEGORIES = [
   'Breakfast',
@@ -46,14 +47,27 @@ export default function EditRecipePage() {
         setLoading(false);
         return;
       }
-      setRecipe(data);
+      const recipe: Recipe = {
+        id: data.id as string,
+        created_at: data.created_at as string,
+        user_id: data.user_id as string,
+        title: data.title as string,
+        description: data.description as string | null,
+        ingredients: data.ingredients as string[],
+        cooking_time: data.cooking_time as number | null,
+        difficulty: data.difficulty as 'easy' | 'medium' | 'hard' | null,
+        category: data.category as string,
+        instructions: data.instructions as string[],
+        image_url: data.image_url as string | null,
+      };
+      setRecipe(recipe);
       setForm({
-        title: data.title || '',
-        description: data.description || '',
-        ingredients: data.ingredients || [''],
-        instructions: data.instructions || [''],
-        category: data.category || CATEGORIES[0],
-        image_url: data.image_url || '',
+        title: recipe.title || '',
+        description: recipe.description || '',
+        ingredients: recipe.ingredients || [''],
+        instructions: recipe.instructions || [''],
+        category: recipe.category || CATEGORIES[0],
+        image_url: recipe.image_url || '',
       });
       setLoading(false);
     };
@@ -97,7 +111,7 @@ export default function EditRecipePage() {
     if (imageFile) {
       const fileExt = imageFile.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
-      const { data, error: uploadError } = await supabase.storage.from('recipe-images').upload(fileName, imageFile);
+      const { error: uploadError } = await supabase.storage.from('recipe-images').upload(fileName, imageFile);
       if (uploadError) {
         setError('Image upload failed.');
         setLoading(false);

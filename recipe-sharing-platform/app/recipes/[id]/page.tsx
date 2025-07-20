@@ -1,23 +1,17 @@
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import type { Recipe } from '@/lib/types/database';
 import RecipeEditLink from '@/components/recipe-edit-link';
 import LikeButton from '@/components/like-button';
 import CommentsSection from '@/components/comments-section';
 
 interface RecipeDetailPageProps {
-  params: { id: string } | Promise<{ id: string }>;
+  params: Promise<{ id: string }>;
 }
 
 export default async function RecipeDetailPage({ params }: RecipeDetailPageProps) {
-  // Support both sync and async params (Next.js 15+)
-  let id: string;
-  if (typeof (params as unknown as { then?: unknown }).then === 'function') {
-    ({ id } = await params as Promise<{ id: string }>);
-  } else {
-    ({ id } = params as { id: string });
-  }
+  // Support async params (Next.js 15+)
+  const { id } = await params;
 
   const supabase = createClient();
   const { data: recipe, error } = await supabase
@@ -34,10 +28,6 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
     .select('full_name, username')
     .eq('id', recipe.user_id)
     .single();
-
-  // Fetch current user
-  const { data: { user } } = await supabase.auth.getUser();
-  const isOwner = user && user.id === recipe.user_id;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 py-12 px-4">

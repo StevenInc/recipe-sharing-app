@@ -1,4 +1,3 @@
-import Image from "next/image";
 import SupabaseStatusBadge from '@/components/supabase-status-badge'
 
 export default function HomePage() {

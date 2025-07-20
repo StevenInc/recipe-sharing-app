@@ -41,7 +41,16 @@ export default function DashboardPage() {
       if (profileError) {
         setError(profileError.message)
       } else {
-        setProfile(profileData)
+        const profile: Profile = {
+          id: profileData.id as string,
+          created_at: profileData.created_at as string,
+          username: profileData.username as string,
+          full_name: profileData.full_name as string,
+          updated_at: profileData.updated_at as string,
+          email: profileData.email as string,
+          bio: profileData.bio as string | null
+        };
+        setProfile(profile)
       }
       // Fetch all recipes (not just user's)
       const { data: recipeData, error: recipeError } = await supabase
@@ -51,7 +60,20 @@ export default function DashboardPage() {
       if (recipeError) {
         setError(recipeError.message)
       } else {
-        setRecipes(recipeData || [])
+        const recipes: Recipe[] = (recipeData || []).map(recipe => ({
+          id: recipe.id as string,
+          created_at: recipe.created_at as string,
+          user_id: recipe.user_id as string,
+          title: recipe.title as string,
+          description: recipe.description as string | null,
+          ingredients: recipe.ingredients as string[],
+          cooking_time: recipe.cooking_time as number | null,
+          difficulty: recipe.difficulty as 'easy' | 'medium' | 'hard' | null,
+          category: recipe.category as string,
+          instructions: recipe.instructions as string[],
+          image_url: recipe.image_url as string | null
+        }));
+        setRecipes(recipes)
       }
       setLoading(false)
     }
